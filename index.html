@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Food Jar" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="description" content="把每一餐變成糖果，收進每個月的 Food Jar。" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="assets/icon-192.png" />
@@ -20,7 +21,7 @@
   <div class="ambient ambient-b"></div>
 
   <!-- AUTH -->
-  <section id="authView" class="auth-view">
+  <section id="authView" class="auth-view hidden">
     <div class="auth-shell">
       <div class="auth-art paper-dots" aria-hidden="true">
         <div class="auth-sticker auth-sticker-a">eat well ♡</div>
@@ -225,7 +226,7 @@
 
         <!-- PROFILE -->
         <section id="profilePage" class="page">
-          <div class="section-hero compact"><div><p class="eyebrow">MY CORNER</p><h2>把 Food Jar 調成你的樣子。</h2><p>設定每月預算、罐子名稱、主題色與登入帳號。</p></div></div>
+          <div class="section-hero compact"><div><p class="eyebrow">MY CORNER</p><h2>把 Food Jar 調成你的樣子。</h2><p>設定當月預算、罐子名稱、主題色與資料備份。</p></div></div>
 
           <div class="profile-grid">
             <section class="profile-card paper-dots-soft"><div id="bigAvatar" class="big-avatar">🍓</div><p class="eyebrow">MY FOOD JAR</p><h3 id="profileName">我的飯飯罐</h3><p id="profileEmail">preview@foodjar.local</p><div class="profile-mini-stats"><span><b id="profileMeals">0</b> meals</span><span><b id="profileMonths">1</b> month</span></div></section>
@@ -234,16 +235,19 @@
               <section class="settings-card">
                 <div class="setting-head"><span>🫙</span><div><b>糖果罐設定</b><small>名稱、預算與外觀</small></div></div>
                 <label class="field"><span>Jar name</span><input id="jarNameInput" type="text" maxlength="24" value="我的飯飯罐" /></label>
-                <label class="field"><span>每月餐飲預算</span><div class="input-prefix"><b>NT$</b><input id="budgetInput" type="number" min="100" step="100" value="8000" /></div></label>
+                <label class="field"><span id="budgetMonthLabel">本月餐飲預算</span><div class="input-prefix"><b>NT$</b><input id="budgetInput" type="number" min="100" step="100" value="8000" /></div></label>
                 <div class="field"><span>主題色</span><div id="themeOptions" class="theme-options"><button class="theme-dot active" data-theme-value="blush" type="button"><i></i><small>Blush</small></button><button class="theme-dot" data-theme-value="mint" type="button"><i></i><small>Mint</small></button><button class="theme-dot" data-theme-value="lavender" type="button"><i></i><small>Lavender</small></button></div></div>
                 <div class="field"><span>我的小圖示</span><div id="avatarOptions" class="avatar-options"><button class="avatar-option active" type="button">🍓</button><button class="avatar-option" type="button">🍒</button><button class="avatar-option" type="button">🧸</button><button class="avatar-option" type="button">🌷</button><button class="avatar-option" type="button">🍮</button></div></div>
                 <button id="saveSettings" class="primary-btn" type="button">儲存設定 ♡</button>
               </section>
 
               <section class="settings-card">
-                <div class="setting-head"><span>✉️</span><div><b>帳號與同步</b><small id="accountModeText">目前是預覽模式</small></div></div>
+                <div class="setting-head"><span>✉️</span><div><b>紀錄與備份</b><small id="accountModeText">目前是預覽模式</small></div></div>
                 <div class="account-row"><span id="accountDot"></span><div><b id="accountTitle">Local preview</b><small id="accountMeta">資料儲存在這個瀏覽器</small></div></div>
                 <button id="exportBtn" class="row-action" type="button"><span>匯出我的紀錄</span><b>JSON ↓</b></button>
+                <button id="importBtn" class="row-action" type="button"><span>還原備份</span><b>JSON ↑</b></button>
+                <input id="importInput" type="file" accept=".json,application/json" class="hidden" />
+                <p class="storage-note">紀錄與照片只保存在此瀏覽器。換裝置或清除網站資料前，請先匯出備份；在新裝置按「還原備份」。</p>
                 <button id="installBtn" class="row-action hidden" type="button"><span>加入手機主畫面</span><b>Install ↓</b></button>
                 <button id="logoutBtn" class="row-action" type="button"><span>登出</span><b>→</b></button>
               </section>
@@ -272,7 +276,7 @@
       <p class="modal-lead">拍下這餐，填上價格；如果之後接上 AI 去背服務，照片就會自動變成透明小貼紙。</p>
 
       <label class="dropzone" id="dropzone">
-        <input id="photoInput" type="file" accept="image/*" capture="environment" />
+        <input id="photoInput" type="file" accept="image/*" />
         <div id="uploadPrompt" class="upload-prompt"><div class="camera-bubble">📷</div><b>拍照或從相簿選餐點</b><small>整份餐點完整入鏡，去背效果會更好。</small><span>選擇照片</span></div>
         <div id="photoStage" class="photo-stage hidden"><div class="checker"></div><img id="photoPreview" alt="餐點預覽" /><div id="photoStatus" class="photo-status">✦ ready</div></div>
       </label>
@@ -315,6 +319,7 @@
   <canvas id="shareCanvas" width="1080" height="1920" class="hidden"></canvas>
   <script src="config.js"></script>
   <script src="cloud.js"></script>
+  <script src="storage.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

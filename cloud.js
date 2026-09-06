@@ -1,7 +1,7 @@
 (() => {
   const cfg = window.FOOD_JAR_CONFIG || {};
   let client = null;
-  const configured = Boolean(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
+  const configured = Boolean(!cfg.LOCAL_ONLY && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
   const BUCKET='meal-images';
 
   async function init(){

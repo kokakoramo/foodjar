@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Food Jar" />
+  <meta name="description" content="把每一餐變成糖果，收進每個月的 Food Jar。" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="icon" href="assets/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>My Food Jar — 月度飲食糖果罐</title>
+</head>
+<body data-theme="blush">
+  <div class="noise"></div>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <!-- AUTH -->
+  <section id="authView" class="auth-view">
+    <div class="auth-shell">
+      <div class="auth-art paper-dots" aria-hidden="true">
+        <div class="auth-sticker auth-sticker-a">eat well ♡</div>
+        <div class="auth-sticker auth-sticker-b">little meals</div>
+        <div class="auth-spark a1">✦</div><div class="auth-spark a2">♡</div><div class="auth-spark a3">⋆</div>
+        <div class="auth-jar-scene">
+          <div class="auth-lid"><span></span></div>
+          <div class="auth-jar">
+            <span class="auth-food af1">🍙</span>
+            <span class="auth-food af2">🍓</span>
+            <span class="auth-food af3">🥐</span>
+            <span class="auth-food af4">🍰</span>
+            <span class="auth-food af5">🥤</span>
+            <span class="auth-food af6">🍜</span>
+          </div>
+          <div class="auth-label">my food jar ♡</div>
+        </div>
+        <p class="auth-art-caption">把這個月吃過的東西，慢慢裝進自己的小罐子。</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-brand"><span>🍬</span><b>food jar</b></div>
+        <p class="eyebrow">YOUR LITTLE FOOD DIARY</p>
+        <h1>每一餐，都是一顆<br><em>小小的糖果。</em></h1>
+        <p class="auth-copy">記錄餐點照片與價格，Food Jar 會把它們收進當月的糖果罐，月底一眼看懂自己吃了什麼、花了多少。</p>
+
+        <form id="emailForm" class="email-form">
+          <label class="field auth-field">
+            <span>你的 Email</span>
+            <input id="emailInput" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required />
+          </label>
+          <button id="emailLoginBtn" class="primary-btn auth-submit" type="submit">寄送登入連結 <span>→</span></button>
+        </form>
+
+        <div id="emailSent" class="sent-card hidden" aria-live="polite">
+          <span class="sent-icon">💌</span>
+          <div><b>登入信已寄出</b><p id="emailSentText">請到信箱點一下登入連結，就會回到你的 Food Jar。</p></div>
+        </div>
+
+        <button id="previewBtn" class="preview-btn" type="button">先看看網站預覽 <span>♡</span></button>
+        <p class="auth-note">正式上線後使用 Email Magic Link，不需要密碼。預覽模式的資料只會存在目前瀏覽器。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <div id="appView" class="app-view hidden">
+    <header class="topbar">
+      <button id="brandHome" class="brand-pill" type="button" aria-label="回到首頁"><span>🍬</span><b>food jar</b></button>
+      <div class="topbar-middle"><span id="desktopMonthTitle">September 2026</span><small id="syncText">local preview</small></div>
+      <div class="topbar-actions">
+        <button id="topAddBtn" class="top-add" type="button"><span>＋</span> 新增一餐</button>
+        <button id="avatarBtn" class="avatar-btn" type="button" aria-label="我的帳號"><span id="avatarEmoji">🍓</span><i></i></button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="side-nav" aria-label="主要導覽">
+        <div class="side-card">
+          <button class="nav-item active" data-page="jarPage" type="button"><span>🫙</span><b>My Jar</b><small>本月糖果罐</small></button>
+          <button class="nav-item" data-page="diaryPage" type="button"><span>📖</span><b>Diary</b><small>餐點日記</small></button>
+          <button class="nav-item" data-page="recapPage" type="button"><span>✦</span><b>Recap</b><small>月度回顧</small></button>
+          <button class="nav-item" data-page="profilePage" type="button"><span>🎀</span><b>Me</b><small>設定與帳號</small></button>
+        </div>
+        <div class="side-note paper-dots-soft">
+          <span>♡</span><b>small reminder</b><p>記帳不是限制自己，是更了解自己。</p>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <!-- JAR PAGE -->
+        <section id="jarPage" class="page active">
+          <div class="hero-row">
+            <div>
+              <p class="eyebrow">MY LITTLE FOOD DIARY</p>
+              <h2 id="greeting">今天也有好好吃飯嗎？</h2>
+              <p id="heroSub" class="hero-sub">慢慢記就好，月底再一起看看這個月的故事。</p>
+            </div>
+            <div class="month-control">
+              <button id="prevMonth" class="month-arrow" type="button" aria-label="上個月">‹</button>
+              <button id="monthPickerBtn" class="month-label-btn" type="button"><strong id="monthLabel">September 2026</strong><span id="monthSubLabel">this month</span></button>
+              <button id="nextMonth" class="month-arrow" type="button" aria-label="下個月">›</button>
+              <input id="monthPicker" class="visually-hidden" type="month" />
+            </div>
+          </div>
+
+          <div class="home-grid">
+            <section class="jar-card paper-dots-soft">
+              <div class="jar-card-top">
+                <div><span class="tiny-label">MONTHLY JAR</span><b id="jarNameHeading">我的飯飯罐</b></div>
+                <span id="dayStamp" class="day-stamp">SEP 05</span>
+              </div>
+              <div class="float-note note-a">eat well ♡</div>
+              <div class="float-note note-b">yum!</div>
+              <div class="spark s1">✦</div><div class="spark s2">⋆</div><div class="spark s3">♡</div>
+
+              <div class="jar-scene">
+                <div class="jar-wrap">
+                  <div class="jar-lid"><span></span><i></i></div>
+                  <div class="jar-neck"></div>
+                  <div id="jar" class="jar">
+                    <div id="budgetWash" class="budget-wash"></div>
+                    <div class="jar-highlight jh1"></div><div class="jar-highlight jh2"></div>
+                    <div id="jarItems" class="jar-items"></div>
+                    <button id="overflowItems" class="overflow-items hidden" type="button"></button>
+                    <div class="jar-floor"></div>
+                  </div>
+                  <div class="jar-label-card"><span id="jarLabelText">my food jar</span><b id="jarCount">0 meals</b></div>
+                </div>
+              </div>
+
+              <div class="budget-strip">
+                <div class="budget-head"><span>monthly budget</span><b id="budgetHint">NT$0 / NT$8,000</b></div>
+                <div class="progress"><i id="budgetProgress"></i><em id="paceMarker" title="今天建議進度"></em></div>
+              </div>
+            </section>
+
+            <div class="home-side">
+              <section class="spend-card">
+                <span>本月餐飲支出</span>
+                <strong id="monthTotal">NT$0</strong>
+                <small id="monthDelta">正在建立你的第一個月份 ♡</small>
+                <div id="budgetBadge" class="budget-badge">還有很多空間 ✿</div>
+              </section>
+
+              <section class="quick-stats">
+                <div><span>平均每餐</span><b id="homeAvg">NT$0</b><small>average</small></div>
+                <div><span>今天吃了</span><b id="todayMeals">0 餐</b><small>today</small></div>
+                <div><span>剩餘預算</span><b id="homeRemaining">NT$0</b><small>remaining</small></div>
+              </section>
+
+              <section class="pace-card">
+                <div class="pace-ring"><span id="pacePercent">0%</span><small>month</small></div>
+                <div class="pace-copy"><p class="eyebrow">BUDGET PACE</p><h4 id="paceTitle">慢慢裝滿就好 ♡</h4><p id="paceCopy">有了紀錄後，我會幫你估算月底大概會花多少。</p></div>
+                <div class="pace-metrics"><span>今日可用<b id="dailyAllowance">NT$0</b></span><span>月底預估<b id="forecastSpend">NT$0</b></span></div>
+              </section>
+
+              <button id="feedBtn" class="feed-btn" type="button"><span class="feed-icon">＋</span><span><b>Feed my jar</b><small>把今天這餐收進罐子</small></span><i>→</i></button>
+            </div>
+          </div>
+
+          <section class="recent-section">
+            <div class="section-title-row"><div><p class="eyebrow">RECENT MEMORIES</p><h3>最近吃了什麼</h3></div><button id="seeAllDiary" class="text-link" type="button">看全部 →</button></div>
+            <div id="recentMeals" class="recent-grid"></div>
+          </section>
+        </section>
+
+        <!-- DIARY -->
+        <section id="diaryPage" class="page">
+          <div class="section-hero compact">
+            <div><p id="diaryEyebrow" class="eyebrow">SEPTEMBER DIARY</p><h2>這個月吃了什麼？</h2><p>照片、價格、店名與當天的小備註，都放在這裡。</p></div>
+            <button id="diaryAdd" class="soft-add" type="button">＋ 新增一餐</button>
+          </div>
+
+          <div class="diary-summary-row">
+            <div><span id="diaryCountBig">0</span><small>meals</small><p>本月餐點</p></div>
+            <div><span id="diarySpendBig">NT$0</span><small>spent</small><p>本月支出</p></div>
+            <div><span id="diaryAvgBig">NT$0</span><small>average</small><p>平均每餐</p></div>
+          </div>
+
+          <div class="diary-controls">
+            <div id="typeFilters" class="filter-row">
+              <button class="filter-pill active" data-filter="全部" type="button">全部</button>
+              <button class="filter-pill" data-filter="早餐" type="button">早餐</button>
+              <button class="filter-pill" data-filter="午餐" type="button">午餐</button>
+              <button class="filter-pill" data-filter="晚餐" type="button">晚餐</button>
+              <button class="filter-pill" data-filter="飲料" type="button">飲料</button>
+              <button class="filter-pill" data-filter="甜點" type="button">甜點</button>
+              <button class="filter-pill" data-filter="宵夜" type="button">宵夜</button>
+            </div>
+            <div class="search-wrap"><span>⌕</span><input id="diarySearch" type="search" placeholder="搜尋店名、餐點或備註" /></div>
+          </div>
+          <div id="diaryList" class="diary-list"></div>
+        </section>
+
+        <!-- RECAP -->
+        <section id="recapPage" class="page">
+          <div class="section-hero compact">
+            <div><p class="eyebrow">MONTHLY RECAP</p><h2>這個月，裝進了一罐什麼？</h2><p>把花費變成比較容易看懂的節奏，而不是只有冷冰冰的數字。</p></div>
+            <button id="shareCardBtn" class="soft-add" type="button">✦ 生成分享卡</button>
+          </div>
+
+          <section class="recap-banner paper-dots-soft">
+            <div><p id="recapMonth" class="eyebrow">SEPTEMBER 2026</p><h3>this month, in a jar ♡</h3><strong id="recapTotal">NT$0</strong><p id="budgetText">本月預算 NT$8,000</p></div>
+            <div class="recap-jar-mini"><div class="recap-mini-lid"></div><div class="recap-mini-body"><span>🍙</span><span>🍓</span><span>🥤</span><span>🥐</span></div></div>
+          </section>
+
+          <div class="stat-grid">
+            <div class="stat-card"><span>🍽️</span><b id="statMeals">0</b><small>本月餐數</small></div>
+            <div class="stat-card"><span>🎀</span><b id="statAvg">NT$0</b><small>平均每餐</small></div>
+            <div class="stat-card"><span>⭐</span><b id="statMax">NT$0</b><small>最貴一餐</small></div>
+            <div class="stat-card"><span>🥤</span><b id="statTreats">0</b><small>飲料 / 甜點</small></div>
+          </div>
+
+          <div class="insight-grid">
+            <section class="insight-card"><div class="insight-head"><div><p class="eyebrow">WEEKLY RHYTHM</p><h3>每週花費</h3></div><span id="weekPeak">—</span></div><div id="weekBars" class="week-bars"></div></section>
+            <section class="insight-card"><div class="insight-head"><div><p class="eyebrow">WHAT DID I EAT?</p><h3>餐別分布</h3></div><span id="topCategory">—</span></div><div id="categoryBars" class="category-bars"></div></section>
+          </div>
+
+          <section class="insight-card calendar-card"><div class="insight-head"><div><p class="eyebrow">MONTH AT A GLANCE</p><h3>花費日曆</h3></div><span id="activeDays">0 days</span></div><div class="weekday-row"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div><div id="spendCalendar" class="spend-calendar"></div></section>
+        </section>
+
+        <!-- PROFILE -->
+        <section id="profilePage" class="page">
+          <div class="section-hero compact"><div><p class="eyebrow">MY CORNER</p><h2>把 Food Jar 調成你的樣子。</h2><p>設定每月預算、罐子名稱、主題色與登入帳號。</p></div></div>
+
+          <div class="profile-grid">
+            <section class="profile-card paper-dots-soft"><div id="bigAvatar" class="big-avatar">🍓</div><p class="eyebrow">MY FOOD JAR</p><h3 id="profileName">我的飯飯罐</h3><p id="profileEmail">preview@foodjar.local</p><div class="profile-mini-stats"><span><b id="profileMeals">0</b> meals</span><span><b id="profileMonths">1</b> month</span></div></section>
+
+            <div class="settings-stack">
+              <section class="settings-card">
+                <div class="setting-head"><span>🫙</span><div><b>糖果罐設定</b><small>名稱、預算與外觀</small></div></div>
+                <label class="field"><span>Jar name</span><input id="jarNameInput" type="text" maxlength="24" value="我的飯飯罐" /></label>
+                <label class="field"><span>每月餐飲預算</span><div class="input-prefix"><b>NT$</b><input id="budgetInput" type="number" min="100" step="100" value="8000" /></div></label>
+                <div class="field"><span>主題色</span><div id="themeOptions" class="theme-options"><button class="theme-dot active" data-theme-value="blush" type="button"><i></i><small>Blush</small></button><button class="theme-dot" data-theme-value="mint" type="button"><i></i><small>Mint</small></button><button class="theme-dot" data-theme-value="lavender" type="button"><i></i><small>Lavender</small></button></div></div>
+                <div class="field"><span>我的小圖示</span><div id="avatarOptions" class="avatar-options"><button class="avatar-option active" type="button">🍓</button><button class="avatar-option" type="button">🍒</button><button class="avatar-option" type="button">🧸</button><button class="avatar-option" type="button">🌷</button><button class="avatar-option" type="button">🍮</button></div></div>
+                <button id="saveSettings" class="primary-btn" type="button">儲存設定 ♡</button>
+              </section>
+
+              <section class="settings-card">
+                <div class="setting-head"><span>✉️</span><div><b>帳號與同步</b><small id="accountModeText">目前是預覽模式</small></div></div>
+                <div class="account-row"><span id="accountDot"></span><div><b id="accountTitle">Local preview</b><small id="accountMeta">資料儲存在這個瀏覽器</small></div></div>
+                <button id="exportBtn" class="row-action" type="button"><span>匯出我的紀錄</span><b>JSON ↓</b></button>
+                <button id="installBtn" class="row-action hidden" type="button"><span>加入手機主畫面</span><b>Install ↓</b></button>
+                <button id="logoutBtn" class="row-action" type="button"><span>登出</span><b>→</b></button>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="bottom-nav" aria-label="主要導覽">
+      <button class="nav-item active" data-page="jarPage" type="button"><span>🫙</span><small>Jar</small></button>
+      <button class="nav-item" data-page="diaryPage" type="button"><span>📖</span><small>Diary</small></button>
+      <button class="nav-item" data-page="recapPage" type="button"><span>✦</span><small>Recap</small></button>
+      <button class="nav-item" data-page="profilePage" type="button"><span>🎀</span><small>Me</small></button>
+    </nav>
+  </div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="mealModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mealModalTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card meal-modal-card">
+      <div class="modal-handle"></div>
+      <button id="closeMealModal" class="modal-close" type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">NEW FOOD MEMORY</p>
+      <h2 id="mealModalTitle">餵一顆糖果給罐子 🍬</h2>
+      <p class="modal-lead">拍下這餐，填上價格；如果之後接上 AI 去背服務，照片就會自動變成透明小貼紙。</p>
+
+      <label class="dropzone" id="dropzone">
+        <input id="photoInput" type="file" accept="image/*" capture="environment" />
+        <div id="uploadPrompt" class="upload-prompt"><div class="camera-bubble">📷</div><b>拍照或從相簿選餐點</b><small>整份餐點完整入鏡，去背效果會更好。</small><span>選擇照片</span></div>
+        <div id="photoStage" class="photo-stage hidden"><div class="checker"></div><img id="photoPreview" alt="餐點預覽" /><div id="photoStatus" class="photo-status">✦ ready</div></div>
+      </label>
+
+      <div id="photoActions" class="photo-actions hidden"><button id="replacePhoto" type="button">↺ 換照片</button><button id="stickerToggle" class="active" type="button">✦ 白邊貼紙</button></div>
+
+      <div class="form-grid two">
+        <label class="field"><span>價格</span><div class="input-prefix"><b>NT$</b><input id="priceInput" type="number" inputmode="numeric" min="1" placeholder="120" required /></div></label>
+        <label class="field"><span>餐別</span><select id="typeInput"><option>早餐</option><option selected>午餐</option><option>晚餐</option><option>飲料</option><option>甜點</option><option>宵夜</option></select></label>
+      </div>
+      <label class="field"><span>餐點 / 店名 <em>選填</em></span><input id="titleInput" type="text" maxlength="40" placeholder="例如：雞腿便當" /></label>
+      <div class="form-grid two">
+        <label class="field"><span>日期</span><input id="dateInput" type="date" /></label>
+        <label class="field"><span>付款方式 <em>選填</em></span><select id="paymentInput"><option value="">不記錄</option><option>現金</option><option>信用卡</option><option>行動支付</option><option>其他</option></select></label>
+      </div>
+      <label class="field"><span>小備註 <em>選填</em></span><input id="noteInput" type="text" maxlength="80" placeholder="今天這家雞腿很好吃 ♡" /></label>
+      <button id="saveMealBtn" class="primary-btn save-meal-btn" type="button">放進罐子 <span>♡</span></button>
+    </div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close-detail></div>
+    <div class="modal-card detail-modal-card">
+      <div class="modal-handle"></div>
+      <button id="closeDetailModal" class="modal-close" type="button">×</button>
+      <div class="detail-photo paper-dots-soft"><img id="detailImage" alt="餐點" /></div>
+      <p id="detailDate" class="eyebrow"></p>
+      <div class="detail-title-row"><h2 id="detailTitle"></h2><span id="detailType" class="type-tag"></span></div>
+      <strong id="detailPrice" class="detail-price"></strong>
+      <p id="detailMeta" class="detail-meta"></p>
+      <p id="detailNote" class="detail-note hidden"></p>
+      <div class="detail-actions"><button id="editMealBtn" class="secondary-btn" type="button">編輯</button><button id="deleteMealBtn" class="danger-btn" type="button">刪除</button></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <canvas id="shareCanvas" width="1080" height="1920" class="hidden"></canvas>
+  <script src="config.js"></script>
+  <script src="cloud.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

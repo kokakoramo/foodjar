@@ -1,43 +1,43 @@
-# My Food Jar v6 — Complete Web App
+# Food Jar v6 — 個人本機保存版
 
-這是完整的 responsive PWA 前端版本，手機與桌機都能使用。
+延續原 v6 HTML/CSS/JS，保留 Jar、Diary、Recap、搜尋、餐點 CRUD、主題與分享卡。
 
-## 已完成
-- Email-only 登入介面（Magic Link 架構）
-- 無後端時可用「網站預覽」進入完整功能
-- 每月糖果罐、價格視覺化、預算進度與月底預估
-- 餐點新增 / 編輯 / 刪除 / 搜尋 / 分類
-- 手機拍照或相簿上傳，圖片壓縮並做貼紙預覽
-- Diary、Monthly Recap、週花費、餐別分布、花費日曆
-- 月底分享卡
-- 主題、罐子名稱、預算、Avatar 設定
-- JSON 備份匯出
-- PWA manifest + service worker，可部署後加入手機主畫面
-- Supabase schema 與 RLS，確保每個帳號只能讀寫自己的資料
+## 使用方式
 
-## 本機預覽
-在資料夾內執行：
+直接開啟網站即可記帳，不需要登入或填入 Supabase 設定。
+紀錄及照片保存在目前瀏覽器的 IndexedDB，成功寫入後才顯示儲存成功。
+第一次開啟會搬移 `foodjar_v6_state` 的既有資料；原 localStorage 備份不刪除。
+全新使用者從空罐子開始。不同月份的預算獨立，未設定月份沿用 v6 的原預算。
+
+設定頁可匯出 JSON（含本機照片）並還原備份。還原會取代目前紀錄並先要求確認。
+資料不會自動跨裝置同步；清除網站資料、無痕工作階段結束或瀏覽器回收空間可能造成資料遺失。
+請定期備份。原雲端 HTTPS 圖片連結不是嵌入式照片，仍依賴原服務可用性。
+
+## PWA
+
+包含 192 / 512 px FJ 字樣圖示。示範餐點缺少的 PNG 改用既有餐點 Emoji。
+核心檔案完整才安裝新版快取；選用圖示失敗不會讓整次安裝失敗。
+僅快取本站明列的靜態檔案，不快取 API、私人圖片或帶查詢參數的 URL。
+更新等待舊分頁關閉，避免在同一分頁混用程式版本。更新後關閉所有 Food Jar 分頁再開啟。
+首次連網載入並完成安裝後，標準網站網址可離線開啟；帶查詢參數的網址不保證離線。
+
+## 開發與驗證
+
+仍為無建置步驟的靜態 GitHub Pages 網站。
 
 ```bash
-python3 -m http.server 8080
+npm ci
+npm run dev
+node --test tests/p0.test.cjs
 ```
 
-瀏覽器開 `http://localhost:8080`。
+自動測試涵蓋搬移、月份預算、備份驗證、儲存失敗回復、資產與 Service Worker 邊界。
+另已實測桌面照片保存、390 px 排版與編輯、月份預算、含照片的備份下載。
+真實 iPhone Safari 與離線端到端測試尚未完成。
+詳細待驗收項目見 `QA.md`。
 
-## 啟用真正 Email Magic Link
-1. 建立 Supabase 專案。
-2. 在 SQL Editor 執行 `supabase_schema.sql`。
-3. 到 Authentication > URL Configuration 設定正式網站 URL / Redirect URL。
-4. 編輯 `config.js`：填入 `SUPABASE_URL` 與 `SUPABASE_ANON_KEY`。
-5. 部署到 HTTPS（Vercel / Netlify / GitHub Pages 均可）。
+## 暫停與後續
 
-> 不要把 Supabase `service_role` key 放在前端；只使用 anon / publishable key。
-
-## AI 去背
-`config.js` 的 `REMOVE_BG_ENDPOINT` 可填入自己的去背 API。介面會在上傳圖片後呼叫該 API，預期回傳：
-
-```json
-{"image":"data:image/png;base64,..."}
-```
-
-若不設定，網站仍會正常運作，使用原圖作為貼紙。
+`LOCAL_ONLY: true` 停用登入及 Supabase 連線。原 cloud.js 與 SQL 保留，沒有重新啟用或驗證雲端模式。
+目前空白的去背 API 設定代表使用原圖；透明 PNG 上傳會保留透明度。
+真正 AI 去背、縮圖、Matter.js 碰撞、餐點拆分尚未實作，本次不宣稱完成。

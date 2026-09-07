@@ -85,7 +85,9 @@
     }catch{toast('目前無法存取儲存空間，儲存餐點時會再次嘗試')}
     state.budgets??={};
     bindEvents();
-    if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>toast('離線功能尚未就緒，請連網後重新開啟'));
+    if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+      navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('#offlineStatus').textContent='離線已準備好，沒有網路也能記帳'}).catch(()=>{$('#offlineStatus').textContent='離線功能尚未就緒，請連網後重新開啟'});
+    }else $('#offlineStatus').textContent='此瀏覽器目前未啟用離線功能';
     if(window.FOOD_JAR_CONFIG?.LOCAL_ONLY!==false){showApp();return}
     const cloud=window.FoodJarCloud;
     if(cloud?.configured){

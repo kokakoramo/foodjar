@@ -1,0 +1,7 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Food Jar responsive QA</title>
+<style>body{margin:0;background:#ddd;font:16px system-ui}nav{padding:8px;text-align:center}iframe{display:block;margin:auto;border:0;background:white;height:844px}button{padding:8px 16px}</style>
+<nav><button data-width="320">320 px</button><button data-width="390">390 px</button><button data-width="430">430 px</button></nav>
+<iframe title="Food Jar mobile" width="390" src="../index.html"></iframe>
+<script>document.querySelectorAll('button').forEach(button=>button.onclick=()=>document.querySelector('iframe').width=button.dataset.width)</script>

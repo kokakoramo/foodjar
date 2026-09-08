@@ -9,7 +9,7 @@ const source=name=>fs.readFileSync(path.join(root,name),'utf8');
 function application(legacy){
   const nodes=new Map();
   const node=selector=>{
-    if(!nodes.has(selector))nodes.set(selector,{value:'',textContent:'',disabled:false,style:{},classList:{add(){},remove(){},toggle(){}},focus(){}});
+    if(!nodes.has(selector))nodes.set(selector,{value:'',textContent:'',disabled:false,style:{},classList:{add(){},remove(){},toggle(){}},focus(){},scrollIntoView(){}});
     return nodes.get(selector);
   };
   let stored,fail=false;
@@ -19,7 +19,7 @@ function application(legacy){
   const code=source('app.js').replace('  boot();',`  window.test={normalizeState,loadState,monthBudget,saveMeal,
     getState:()=>state,setMonth:(y,m)=>selectedMonth=new Date(y,m-1,1),
     setReady:()=>storageReady=true};
-    renderAll=()=>{};closeMealModal=()=>{};`);
+    renderAll=()=>{};closeMealModal=()=>{};goPage=()=>{};`);
   vm.runInNewContext(code,sandbox);
   return {api:sandbox.window.test,node,getStored:()=>stored,setFail:()=>fail=true};
 }

@@ -125,7 +125,7 @@
                   <div id="jar" class="jar">
                     <div id="budgetWash" class="budget-wash"></div>
                     <div class="jar-highlight jh1"></div><div class="jar-highlight jh2"></div>
-                    <div id="jarItems" class="jar-items"></div>
+                    <div id="jarItems" class="jar-items" aria-label="可拖曳的食物罐"></div>
                     <button id="overflowItems" class="overflow-items hidden" type="button"></button>
                     <div class="jar-floor"></div>
                   </div>
@@ -133,6 +133,7 @@
                 </div>
               </div>
 
+              <div class="jar-play-tools"><span>拖一拖食物，讓心情鬆一下 ♡</span><button id="jarSound" type="button" aria-label="碰撞音效" aria-pressed="true">♫ 音效開</button></div>
               <div class="budget-strip">
                 <div class="budget-head"><span>monthly budget</span><b id="budgetHint">NT$0 / NT$8,000</b></div>
                 <div class="progress"><i id="budgetProgress"></i><em id="paceMarker" title="今天建議進度"></em></div>
@@ -321,6 +322,8 @@
   <script src="config.js"></script>
   <script src="cloud.js"></script>
   <script src="storage.js"></script>
+  <script src="vendor/matter.min.js"></script>
+  <script src="jar-physics.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

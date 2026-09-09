@@ -49,3 +49,20 @@ button,input,select{font:inherit;color:inherit}button{cursor:pointer}img{max-wid
 @media(max-width:360px){.jar-wrap{transform:scale(.72)}.jar-play-tools{font-size:10px}}
 
 .jar-scene{grid-template-columns:minmax(0,1fr);min-width:0}
+
+.storage-health{font-size:11px;color:#a7808d;margin-bottom:12px;line-height:1.6}.storage-health button{padding:10px;border-radius:12px;border:1px solid #ead3dc;background:#fff4f7;color:#986375}
+.meal-type-shortcuts{padding:0;border:0;margin:0 0 18px}.meal-type-shortcuts legend{font-size:12px;font-weight:700;margin-bottom:9px}.meal-type-shortcuts>div{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.meal-type-shortcuts button{border:1px solid #eadde2;border-radius:15px;min-height:46px;background:#fffafc;color:#a17a88;font-size:14px}.meal-type-shortcuts button[aria-pressed=true]{background:#f3dce5;border-color:#d8a9ba;color:#815867;box-shadow:0 3px 8px #b9809415}
+.jar-celebration{position:fixed;inset:0;z-index:1000;background:rgba(255,247,250,.86);backdrop-filter:blur(5px);display:grid;place-items:center;touch-action:none}.celebration-card{width:min(82vw,340px);text-align:center;color:#986c7e}.celebration-card p{font-size:18px;letter-spacing:.07em}.celebration-food{display:block;width:160px;height:160px;object-fit:contain;margin:30px auto;filter:drop-shadow(0 15px 15px #b17d942f);font-size:100px}.celebration-equation{display:flex;justify-content:center;align-items:center;gap:12px;background:#fff9fc;border:1px solid #ead5df;border-radius:24px;padding:22px 12px;box-shadow:0 14px 30px #ad809417}.celebration-equation strong{font-size:32px;color:#855c6c}.celebration-equation span{font-size:22px;color:#bf879f}.celebration-equation .counted{color:#9b7889}
+
+/* Roomier monthly jar: about 22% wider and 46% more usable inner area on iPhone. */
+.jar-scene{height:535px}
+.jar-wrap{width:360px;height:505px}
+.jar-lid{width:260px;left:50px;top:8px}
+.jar-lid span{width:206px}
+.jar-lid i{width:218px}
+.jar-neck{width:236px;left:62px;top:54px}
+.jar{left:15px;top:80px;width:316px;height:390px;border-radius:46px 46px 76px 76px}
+.jar-label-card{left:100px;width:160px;bottom:0}
+@media(max-width:820px){.jar-card{min-height:665px}.jar-scene{height:500px}.jar-wrap{transform:scale(.89);margin-top:-3px}}
+@media(max-width:520px){.jar-card{min-height:645px}.jar-scene{height:482px}.jar-wrap{transform:scale(.88);margin-top:-10px}}
+@media(max-width:360px){.jar-card{min-height:600px}.jar-scene{height:435px}.jar-wrap{transform:scale(.72);margin-top:-28px}}

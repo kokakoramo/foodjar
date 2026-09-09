@@ -1,7 +1,7 @@
 'use strict';
 const PREFIX = 'food-jar-';
-const CACHE = PREFIX + 'v6-physics-1';
-const CORE = ['./', './index.html', './styles.css', './app.js', './config.js', './cloud.js', './storage.js', './vendor/matter.min.js', './jar-physics.js', './manifest.webmanifest'];
+const CACHE = PREFIX + 'v6-roomy-jar-1';
+const CORE = ['./', './index.html', './styles.css', './app.js', './config.js', './cloud.js', './storage.js', './vendor/matter.min.js', './jar-physics.js', './celebration.js', './manifest.webmanifest'];
 const OPTIONAL = ['./assets/icon-192.png', './assets/icon-512.png'];
 const absolute = path => new URL(path, self.registration.scope).href;
 const STATIC = new Set([...CORE, ...OPTIONAL].map(absolute));

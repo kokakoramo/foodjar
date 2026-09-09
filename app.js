@@ -26,6 +26,7 @@
   let saving=false;
   let photoRequest=0;
   let pendingDrop=null;
+  let celebratingId=null;
   let selectedMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   let activeFilter='全部';
   let editingId=null;
@@ -44,8 +45,22 @@
   }
   async function persist(){
     if(!storageReady){toast('儲存空間未就緒，請重新開啟網站後再試');return false}
-    try{await window.FoodJarStorage.write(state);navigator.storage?.persist?.().catch(()=>{});return true}
+    try{await window.FoodJarStorage.write(state);updateStorageStatus();navigator.storage?.persist?.().catch(()=>{});return true}
     catch(error){toast(error?.message==='STALE_STATE'?'其他分頁已更新紀錄，請重新整理後再操作':'無法儲存，請檢查瀏覽器空間或匯出備份');return false}
+  }
+  function updateStorageStatus(){
+    const el=$('#storageStatus');if(!el)return;
+    el.textContent=storageReady?`已保存 ${state.meals.length} 餐於此瀏覽器`+(window.FoodJarStorage.status?.mirror?' · 復原副本已更新':' · 請匯出備份保護照片'):'紀錄讀取失敗，請重新讀取；目前已停用儲存，避免覆蓋原資料';
+    $('#retryStorage').classList.toggle('hidden',storageReady);
+  }
+  async function readRecords(){
+    storageReady=false;
+    try{const saved=await window.FoodJarStorage.read();if(saved)state=saved;
+      if(!saved&&state.meals.length)await window.FoodJarStorage.write(state);
+      storageReady=true;
+      if(window.FoodJarStorage.status?.recovered)toast('已從本機復原副本找回紀錄');
+    }catch{toast('紀錄讀取失敗，沒有清除你的資料，請按重新讀取')}
+    state.budgets??={};updateStorageStatus();
   }
   function normalizeState(value){
     if(!value?.profile||!Array.isArray(value.meals))throw new Error('備份格式不正確');
@@ -81,11 +96,9 @@
   function monthLabel(){return `${monthNames[selectedMonth.getMonth()]} ${selectedMonth.getFullYear()}`}
 
   async function boot(){
-    try{const saved=await window.FoodJarStorage.read();if(saved)state=saved;storageReady=true;
-      if(!saved)await window.FoodJarStorage.write(state);
-    }catch{toast('目前無法存取儲存空間，儲存餐點時會再次嘗試')}
-    state.budgets??={};
+    await readRecords();
     bindEvents();
+    $('#retryStorage').onclick=async()=>{await readRecords();renderAll()};
     window.FoodJarPhysics?.setupSound($('#jarSound'));
     if('serviceWorker' in navigator && location.protocol.startsWith('http')){
       navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{$('#offlineStatus').textContent='離線已準備好，沒有網路也能記帳'}).catch(()=>{$('#offlineStatus').textContent='離線功能尚未就緒，請連網後重新開啟'});
@@ -149,7 +162,7 @@
   function renderJar(ms){
     const root=$('#jarItems');
     if(window.FoodJarPhysics){
-      const shown=ms.slice(0,14);
+      const shown=ms.filter(m=>m.id!==celebratingId).slice(0,14);
       if(pendingDrop&&!shown.some(m=>m.id===pendingDrop)){const incoming=ms.find(m=>m.id===pendingDrop);if(incoming){shown.pop();shown.push(incoming)}}
       window.FoodJarPhysics.render(root,shown,ym(),pendingDrop,openDetail);pendingDrop=null;
       const over=$('#overflowItems');over.classList.toggle('hidden',ms.length<=shown.length);over.textContent=`+${ms.length-shown.length}`;over.onclick=()=>goPage('diaryPage');return;
@@ -194,9 +207,10 @@
   function openMealModal(id=null){photoRequest++;$('#saveMealBtn').disabled=false;editingId=id;photoData='';stickerOn=true;$('#stickerToggle').classList.add('active');$('#photoStage').classList.remove('sticker');
     if(id){const m=state.meals.find(x=>x.id===id);if(!m)return;$('#mealModalTitle').textContent='編輯這顆糖果 ♡';$('#priceInput').value=m.price;$('#typeInput').value=m.type;$('#titleInput').value=m.title||'';$('#dateInput').value=m.date;$('#paymentInput').value=m.payment||'';$('#noteInput').value=m.note||'';photoData=m.image||'';stickerOn=m.sticker!==false;if(photoData)showPhoto(photoData);else resetPhoto();}
     else{$('#mealModalTitle').textContent='餵一顆糖果給罐子 🍬';$('#priceInput').value='';$('#typeInput').value='午餐';$('#titleInput').value='';$('#dateInput').value=todayISO();$('#paymentInput').value='';$('#noteInput').value='';resetPhoto()}
-    $('#mealModal').classList.remove('hidden');document.body.style.overflow='hidden';
+    syncTypeChips();$('#mealModal').classList.remove('hidden');document.body.style.overflow='hidden';
   }
   function closeMealModal(){photoRequest++;  $('#mealModal').classList.add('hidden');document.body.style.overflow='';editingId=null }
+  function syncTypeChips(){$$('[data-meal-type]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mealType===$('#typeInput').value)))}
   function resetPhoto(){photoData='';$('#uploadPrompt').classList.remove('hidden');$('#photoStage').classList.add('hidden');$('#photoActions').classList.add('hidden');$('#photoInput').value=''}
   function showPhoto(src){$('#uploadPrompt').classList.add('hidden');$('#photoStage').classList.remove('hidden');$('#photoActions').classList.remove('hidden');$('#photoPreview').src=src;$('#photoStage').classList.toggle('sticker',stickerOn)}
 
@@ -221,7 +235,10 @@
 
   async function saveMeal(){if(saving)return;window.FoodJarPhysics?.unlock();const wasEditing=Boolean(editingId);const price=Number($('#priceInput').value);if(!Number.isFinite(price)||price<=0){toast('先填上這餐的價格 ♡');$('#priceInput').focus();return}const date=$('#dateInput').value||todayISO();const existing=editingId?state.meals.find(m=>m.id===editingId):null;const meal={id:editingId||`meal-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,date,title:$('#titleInput').value.trim()||$('#typeInput').value,type:$('#typeInput').value,price,payment:$('#paymentInput').value,note:$('#noteInput').value.trim(),image:photoData||existing?.image||'',imagePath:existing?.imagePath||'',emoji:existing?.emoji||(!photoData?typeEmoji[$('#typeInput').value]:''),sticker:stickerOn};
     const before=structuredClone(state);saving=true;$('#saveMealBtn').disabled=true;
-    if(editingId){const idx=state.meals.findIndex(m=>m.id===editingId);state.meals[idx]=meal}else state.meals.push(meal);const stored=await persist();saving=false;$('#saveMealBtn').disabled=false;if(!stored){state=before;return}if(session){window.FoodJarCloud.upsertMeal(session.user.id,meal).then(remote=>{const i=state.meals.findIndex(x=>x.id===meal.id);if(i>=0){state.meals[i]=remote;persist();renderAll()}}).catch(()=>toast('已存在本機，雲端同步失敗，請先匯出備份'))}selectedMonth=new Date(Number(date.slice(0,4)),Number(date.slice(5,7))-1,1);closeMealModal();if(!wasEditing){pendingDrop=meal.id;goPage('jarPage')}renderAll();if(!wasEditing)$('#jarItems').scrollIntoView({block:'center',behavior:'instant'});toast(wasEditing?'已更新這顆糖果 ♡':'已放進糖果罐 🍬')}
+    if(editingId){const idx=state.meals.findIndex(m=>m.id===editingId);state.meals[idx]=meal}else state.meals.push(meal);const stored=await persist();saving=false;$('#saveMealBtn').disabled=false;if(!stored){state=before;return}if(session){window.FoodJarCloud.upsertMeal(session.user.id,meal).then(remote=>{const i=state.meals.findIndex(x=>x.id===meal.id);if(i>=0){state.meals[i]=remote;persist();renderAll()}}).catch(()=>toast('已存在本機，雲端同步失敗，請先匯出備份'))}selectedMonth=new Date(Number(date.slice(0,4)),Number(date.slice(5,7))-1,1);closeMealModal();if(!wasEditing){celebratingId=meal.id;goPage('jarPage');renderAll();$('#jarItems').scrollIntoView({block:'center',behavior:'instant'});
+      const drop=()=>{celebratingId=null;pendingDrop=meal.id;renderAll()};
+      if(window.FoodJarCelebration){saving=true;await window.FoodJarCelebration.play(meal,monthTotal()-meal.price,monthTotal(),drop);saving=false}else drop();
+    }else renderAll();toast(wasEditing?'已更新這顆糖果 ♡':'已放進糖果罐 🍬')}
 
   function openDetail(id){detailId=id;const m=state.meals.find(x=>x.id===id);if(!m)return;$('.detail-emoji')?.remove();const img=$('#detailImage');if(m.image){img.src=m.image;img.style.display='block'}else{img.removeAttribute('src');img.style.display='none';const emoji=document.createElement('span');emoji.className='detail-emoji';emoji.style.fontSize='76px';emoji.textContent=m.emoji||typeEmoji[m.type]||'🍬';$('.detail-photo').append(emoji)}$('#detailDate').textContent=`${m.date} · 星期${weekday(m.date)}`;$('#detailTitle').textContent=m.title||m.type;$('#detailType').textContent=m.type;$('#detailPrice').textContent=money(m.price);$('#detailMeta').textContent=[m.payment,`記錄於 ${fmtDate(m.date)}`].filter(Boolean).join(' · ');const note=$('#detailNote');note.textContent=m.note||'';note.classList.toggle('hidden',!m.note);$('#detailModal').classList.remove('hidden');document.body.style.overflow='hidden'}
   function closeDetail(){const wrap=$('.detail-photo');if(!wrap.querySelector('img'))wrap.innerHTML='<img id="detailImage" alt="餐點">';$('#detailModal').classList.add('hidden');document.body.style.overflow='';detailId=null}
@@ -241,6 +258,7 @@
   }
 
   function bindEvents(){
+    $$('[data-meal-type]').forEach(b=>b.onclick=()=>{$('#typeInput').value=b.dataset.mealType;syncTypeChips()});
     $('#emailForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#emailInput').value.trim();if(!email)return;const btn=$('#emailLoginBtn');btn.disabled=true;btn.textContent='寄送中…';try{if(!window.FoodJarCloud?.configured)throw new Error('CLOUD_NOT_CONFIGURED');await window.FoodJarCloud.sendMagicLink(email);$('#emailSent').classList.remove('hidden');$('#emailSentText').textContent=`已寄到 ${email}，請點信中的登入連結。`}catch(err){if(err.message==='CLOUD_NOT_CONFIGURED'){toast('這份是預覽版；正式部署接上 Supabase 後即可寄登入信。')}else toast('登入信暫時寄不出去，請稍後再試')}finally{btn.disabled=false;btn.innerHTML='寄送登入連結 <span>→</span>'}});
     $('#previewBtn').onclick=()=>{safeLSSet(PREVIEW_KEY,'1');showApp()};
     $('#brandHome').onclick=()=>goPage('jarPage');$('#avatarBtn').onclick=()=>goPage('profilePage');$('#topAddBtn').onclick=()=>openMealModal();$('#feedBtn').onclick=()=>openMealModal();$('#diaryAdd').onclick=()=>openMealModal();$('#seeAllDiary').onclick=()=>goPage('diaryPage');

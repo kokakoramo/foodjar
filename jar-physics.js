@@ -4,7 +4,7 @@
   const M=window.Matter;
   if(!M)return;
   const {Engine,Bodies,Body,Composite,Constraint,Events,Sleeping}=M;
-  const W=262,H=304,STEP=1000/60;
+  const W=302,H=376,STEP=1000/60;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let engine,root,entries=[],month='',signature='',frame=0,last=0,accumulator=0,active=true,drag=null;
   let audio,sound=true,lastSound=0,silent=true;
@@ -25,6 +25,11 @@
     gain.gain.exponentialRampToValueAtTime(.0001,t+.22);
     oscillator.connect(gain);gain.connect(audio.destination);oscillator.start(t);oscillator.stop(t+.24);
     oscillator.onended=()=>{oscillator.disconnect();gain.disconnect()};
+  }
+  function cue(kind){
+    if(!sound||!audio||audio.state!=='running')return;
+    const notes=kind==='count'?[523.25,659.25,783.99]:kind==='drop'?[659.25,392]:[392,523.25];
+    notes.forEach((hz,i)=>{const t=audio.currentTime+i*.09,o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(hz,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.035,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.22);o.onended=()=>{o.disconnect();g.disconnect()}});
   }
   function createWorld(){
     const e=Engine.create({enableSleeping:true,positionIterations:10,constraintIterations:4});
@@ -103,5 +108,5 @@
     const label=()=>{button.textContent=sound?'♫ 音效開':'♫ 音效關';button.setAttribute('aria-pressed',String(sound))};label();
     button.onclick=()=>{sound=!sound;try{localStorage.setItem('foodjar_sound',sound?'on':'off')}catch{}label();if(sound){unlock();if(audio)audio.resume().then(()=>chime(5)).catch(()=>{})}else audio?.suspend().catch(()=>{})};
   }
-  window.FoodJarPhysics={render,setActive,unlock,setupSound,createWorld};
+  window.FoodJarPhysics={render,setActive,unlock,setupSound,createWorld,cue};
 })();

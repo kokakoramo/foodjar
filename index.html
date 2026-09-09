@@ -93,6 +93,7 @@
 
       <main class="main-content">
         <!-- JAR PAGE -->
+        <div class="storage-health"><span id="storageStatus" role="status">正在讀取紀錄…</span><button id="retryStorage" type="button" class="hidden">重新讀取</button></div>
         <section id="jarPage" class="page active">
           <div class="hero-row">
             <div>
@@ -285,10 +286,10 @@
 
       <div id="photoActions" class="photo-actions hidden"><button id="replacePhoto" type="button">↺ 換照片</button><button id="stickerToggle" class="active" type="button">✦ 白邊貼紙</button></div>
 
-      <div class="form-grid two">
-        <label class="field"><span>價格</span><div class="input-prefix"><b>NT$</b><input id="priceInput" type="number" inputmode="numeric" min="1" placeholder="120" required /></div></label>
-        <label class="field"><span>餐別</span><select id="typeInput"><option>早餐</option><option selected>午餐</option><option>晚餐</option><option>飲料</option><option>甜點</option><option>宵夜</option></select></label>
-      </div>
+      <label class="field"><span>價格</span><div class="input-prefix"><b>NT$</b><input id="priceInput" type="number" inputmode="numeric" min="1" placeholder="120" required /></div></label>
+      <fieldset class="meal-type-shortcuts"><legend>餐別</legend><div>
+<button type="button" data-meal-type="早餐" aria-pressed="false">🥐 早餐</button><button type="button" data-meal-type="午餐" aria-pressed="true">🍱 午餐</button><button type="button" data-meal-type="晚餐" aria-pressed="false">🍜 晚餐</button><button type="button" data-meal-type="飲料" aria-pressed="false">🥤 飲料</button><button type="button" data-meal-type="甜點" aria-pressed="false">🍰 甜點</button><button type="button" data-meal-type="宵夜" aria-pressed="false">🌙 宵夜</button></div></fieldset>
+      <select id="typeInput" hidden aria-label="餐別"><option>早餐</option><option selected>午餐</option><option>晚餐</option><option>飲料</option><option>甜點</option><option>宵夜</option></select>
       <label class="field"><span>餐點 / 店名 <em>選填</em></span><input id="titleInput" type="text" maxlength="40" placeholder="例如：雞腿便當" /></label>
       <div class="form-grid two">
         <label class="field"><span>日期</span><input id="dateInput" type="date" /></label>
@@ -324,6 +325,7 @@
   <script src="storage.js"></script>
   <script src="vendor/matter.min.js"></script>
   <script src="jar-physics.js"></script>
+  <script src="celebration.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
